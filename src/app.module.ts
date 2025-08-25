@@ -1,4 +1,5 @@
 import { Module, Controller, Get } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GeminiModule } from './modules/gemini/gemini.module';
 
@@ -57,7 +58,13 @@ class AppController {
 }
 
 @Module({
-  imports: [GeminiModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    GeminiModule,
+  ],
   controllers: [AppController],
   providers: [],
 })

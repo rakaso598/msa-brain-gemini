@@ -81,3 +81,59 @@ export class ErrorResponseDto {
   })
   message: string;
 }
+
+export class TranslationDto {
+  @ApiProperty({
+    description: '번역할 텍스트 내용',
+    example: '안녕하세요. 오늘 날씨가 좋네요.',
+    minLength: 1,
+    maxLength: 5000
+  })
+  text: string;
+
+  @ApiProperty({
+    description: '목표 언어 (예: English, Japanese, Chinese, Spanish 등)',
+    example: 'English',
+    minLength: 1,
+    maxLength: 50
+  })
+  targetLang: string;
+}
+
+export class StoryDto {
+  @ApiProperty({
+    description: '이야기의 주제',
+    example: '우주 모험',
+    minLength: 1,
+    maxLength: 100
+  })
+  theme: string;
+
+  @ApiProperty({
+    description: '이야기에 포함할 키워드들 (선택사항)',
+    example: ['우주선', '외계인', '모험'],
+    required: false,
+    type: [String]
+  })
+  keywords?: string[];
+}
+
+export class ParaphraseDto {
+  @ApiProperty({
+    description: '다시 표현할 텍스트',
+    example: '오늘은 날씨가 매우 좋습니다.',
+    minLength: 1,
+    maxLength: 5000
+  })
+  text: string;
+}
+
+export class ImageAnalysisDto {
+  @ApiProperty({
+    description: '이미지에 대한 질문이나 분석 요청',
+    example: '이 이미지에서 무엇을 볼 수 있나요?',
+    minLength: 1,
+    maxLength: 500
+  })
+  query: string;
+}
