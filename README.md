@@ -1,5 +1,47 @@
 # 🤖 Brain API - NestJS 기반 Gemini AI 마이크로서비스
 
+<details>
+  <summary><h2>GCP 배포 URL로 Swagger 문서 접속</h2></summary>
+  
+  <img width="794" height="652" alt="image" src="docs/GCP배포URL로Swagger문서접속.png" />
+  
+</details>
+
+<details>
+  <summary><h2>배포 Swagger 문서에서 실제 API 요청 보내보기</h2></summary>
+  
+  <img width="1264" height="800" alt="image" src="docs/배포Swagger문서에서실제API요청보내보기.png" />
+  
+</details>
+
+<details>
+  <summary><h2>Docker Desktop에서 배포할 이미지 실행시켜보기</h2></summary>
+  
+  <img width="877" height="637" alt="image" src="docs/DockerDesktop에서배포할이미지실행시켜보기.png" />
+  
+</details>
+
+<details>
+  <summary><h2>GCP에서 이미지 빌드 기록 보기</h2></summary>
+  
+  <img width="735" height="454" alt="image" src="docs/GCP에서이미지빌드기록보기.png" />
+  
+</details>
+
+<details>
+  <summary><h2>GCP 배포 시 포트 및 환경변수 설정</h2></summary>
+  
+  <img width="782" height="709" alt="image" src="docs/GCP배포시포트및환경변수설정.png" />
+  
+</details>
+
+<details>
+  <summary><h2>GCP 배포 시 GitHub 레포지토리와 연결하기</h2></summary>
+  
+  <img width="1410" height="832" alt="image" src="docs/GCP배포시GitHub레포지토리와연결하기.png" />
+  
+</details>
+
 ## 🚀 핵심 기능
 
 - **문장 재구성 (Paraphrase)**: 입력 텍스트를 같은 의미로 다양한 표현으로 바꿔줍니다.
