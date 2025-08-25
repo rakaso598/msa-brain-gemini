@@ -1,7 +1,9 @@
 import { Module, Controller, Get } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { APP_GUARD } from '@nestjs/core';
 import { GeminiModule } from './modules/gemini/gemini.module';
+import { ApiKeyGuard } from './guards/api-key.guard';
 
 @ApiTags('health')
 @Controller()
@@ -66,6 +68,11 @@ class AppController {
     GeminiModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ApiKeyGuard,
+    },
+  ],
 })
 export class AppModule {}

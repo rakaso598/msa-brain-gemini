@@ -9,13 +9,14 @@ import {
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiSecurity } from '@nestjs/swagger';
 import { GeminiService } from './gemini.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { TextDto, TranslationDto, StoryDto } from './dto/gemini.dto';
 
 @ApiTags('gemini')
+@ApiSecurity('x-api-key')
 @Controller('gemini')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class GeminiController {

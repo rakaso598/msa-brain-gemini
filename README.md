@@ -78,9 +78,12 @@
 `.env` 파일에 아래와 같이 설정하세요:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
+MY_API_KEY=your_secure_api_key_here
 PORT=8000
 NODE_ENV=production
 ```
+
+> **⚠️ 보안 주의사항**: `MY_API_KEY`는 API 접근을 제어하는 중요한 키입니다. 강력한 키를 설정하고 외부에 노출되지 않도록 주의하세요.
 
 ### 2. Docker로 실행 (권장)
 
@@ -168,6 +171,36 @@ Content-Type: application/json
 ```http
 GET /health
 ```
+
+---
+
+---
+
+## 🔐 API 인증
+
+모든 Gemini API 엔드포인트는 API 키 인증이 필요합니다. 요청 시 헤더에 API 키를 포함해야 합니다.
+
+### API 키 헤더 설정
+
+```bash
+# curl 사용 예시
+curl -X POST "http://localhost:8000/gemini/summarize" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your_secure_api_key_here" \
+  -d '{"text": "요약할 텍스트를 입력하세요"}'
+```
+
+### Swagger UI에서 인증
+
+1. [Swagger 문서](http://localhost:8000/api)에 접속
+2. 우측 상단의 **Authorize** 버튼 클릭
+3. API 키 입력 후 **Authorize** 클릭
+4. 이제 모든 API를 테스트할 수 있습니다
+
+### 인증이 필요하지 않은 엔드포인트
+
+- `GET /` - 서비스 정보
+- `GET /health` - 헬스체크
 
 ---
 

@@ -13,6 +13,15 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .addTag('health', '서버 상태 확인')
     .addTag('gemini', 'Gemini AI 기능')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+        description: 'API 키를 헤더에 포함해주세요'
+      },
+      'x-api-key'
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
