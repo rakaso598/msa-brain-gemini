@@ -2,6 +2,24 @@
 
 NestJS를 사용한 Gemini AI 기반 브레인 컨테이너 프로젝트입니다.
 
+
+```
+
+# 이미지 빌드
+docker build -t msa-brain-gemini:latest .
+
+# 컨테이너 실행
+docker run --rm --env-file .env -p 8000:8000 msa-brain-gemini:latest
+
+# Docker Compose 사용
+docker-compose up -d
+
+# 헬스 체크
+curl http://localhost:8000/health
+
+
+```
+
 ## 📋 주요 기능
 
 - **텍스트 요약 및 키워드 추출**: 긴 텍스트를 핵심 내용으로 요약하고 관련 키워드를 추출합니다.
