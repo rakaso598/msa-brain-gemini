@@ -1,183 +1,136 @@
-# 🤖 Brain API - NestJS 기반 AI 마이크로서비스
+# 🤖 Brain API - NestJS 기반 Gemini AI 마이크로서비스
 
-NestJS를 사용한 Gemini AI 기반 브레인 컨테이너 프로젝트입니다.
+## 🚀 핵심 기능
 
+- **문장 재구성 (Paraphrase)**: 입력 텍스트를 같은 의미로 다양한 표현으로 바꿔줍니다.
+- **다국어 번역 (Translate)**: 텍스트를 원하는 언어로 번역합니다.
+- **이미지 분석 (Analyze Image)**: 이미지를 업로드하고, 원하는 질문에 대해 AI가 이미지 내용을 분석해 답변합니다.
+- **창의적 스토리 생성 (Generate Story)**: 주제와 키워드로 창의적인 짧은 이야기를 생성합니다.
+- **텍스트 요약 및 키워드 추출**: 긴 텍스트를 3줄로 요약하고, 관련 키워드 3개를 추출합니다.
+- **감정 분석**: 텍스트의 감정을 긍정/부정/중립으로 분류하고 이유를 설명합니다.
+- **AI 응답 생성**: 자유로운 쿼리에 대해 도움이 되는 답변을 생성합니다.
 
-```
+---
 
-# 이미지 빌드
-docker build -t msa-brain-gemini:latest .
+## 📡 API 엔드포인트 요약
 
-# 컨테이너 실행
-docker run --rm --env-file .env -p 8000:8000 msa-brain-gemini:latest
+| 메서드 | 엔드포인트                | 설명                       |
+|--------|---------------------------|----------------------------|
+| POST   | /gemini/summarize         | 텍스트 요약 및 키워드 추출 |
+| POST   | /gemini/analyze_sentiment | 감정 분석                  |
+| POST   | /gemini/generate_response | AI 응답 생성               |
+| POST   | /gemini/paraphrase        | 문장 재구성                |
+| POST   | /gemini/translate         | 다국어 번역                |
+| POST   | /gemini/analyze_image     | 이미지 분석                |
+| POST   | /gemini/generate_story    | 창의적 스토리 생성         |
+| GET    | /health                   | 헬스체크                   |
 
-# Docker Compose 사용
-docker-compose up -d
+---
 
-# 헬스 체크
-curl http://localhost:8000/health
+## 🛠️ 빠른 시작
 
+### 1. 환경 변수 설정
 
-```
-
-## 📋 주요 기능
-
-- **텍스트 요약 및 키워드 추출**: 긴 텍스트를 핵심 내용으로 요약하고 관련 키워드를 추출합니다.
-- **감정 분석**: 텍스트의 감정을 분석하여 긍정, 부정, 중립으로 분류합니다.
-- **응답 생성**: 사용자 쿼리에 대해 도움이 되는 답변을 생성합니다.
-
-## 🚀 시작하기
-
-### 환경 변수 설정
-
-`.env` 파일에 Gemini API 키를 설정해주세요:
-
-```bash
+`.env` 파일에 아래와 같이 설정하세요:
+```env
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=8000
-NODE_ENV=development
-```
-
-### 로컬 개발 환경
-
-```bash
-# 의존성 설치
-npm install
-
-# 개발 서버 시작
-npm run start:dev
-
-# 프로덕션 빌드
-npm run build
-
-# 프로덕션 서버 시작
-npm run start:prod
-```
-
-### 🐳 Docker로 실행 (권장)
-
-#### 1. 환경변수 설정
-먼저 `.env` 파일에 실제 Gemini API 키를 설정하세요:
-```bash
-# .env 파일 편집
-GEMINI_API_KEY=your_actual_gemini_api_key_here
 NODE_ENV=production
-PORT=8000
 ```
 
-#### 2. NPM Scripts 사용 (가장 간편)
-```bash
-# 🚀 빌드하고 바로 실행
-npm run docker:dev
+### 2. Docker로 실행 (권장)
 
-# 또는 단계별로 실행
-npm run docker:build     # 이미지 빌드
-npm run docker:run       # 컨테이너 실행 (foreground)
-npm run docker:run:detach # 컨테이너 실행 (background)
-
-# Docker Compose 사용
-npm run docker:compose:up    # 빌드하고 백그라운드 실행
-npm run docker:compose:logs  # 로그 확인
-npm run docker:compose:down  # 중지
-
-# 유틸리티 명령어
-npm run docker:health    # 헬스 체크
-npm run docker:logs      # 컨테이너 로그 확인
-npm run docker:stop      # 컨테이너 중지 및 제거
-npm run docker:clean     # 불필요한 Docker 이미지 정리
-```
-
-#### 3. Docker Compose 사용
-```bash
-# 빌드 및 실행
-docker-compose up -d
-
-# 로그 확인
-docker-compose logs -f brain-api
-
-# 중지
-docker-compose down
-```
-
-#### 4. 개별 Docker 명령어
 ```bash
 # 이미지 빌드
-docker build -t brain-api .
-
-# 컨테이너 실행 (.env 파일 사용)
-docker run -d \
-  --name brain-api-container \
-  --env-file .env \
-  -p 8000:8000 \
-  brain-api
-
-# 또는 환경변수 직접 지정
-docker run -d \
-  --name brain-api-container \
-  -e GEMINI_API_KEY=your_key \
-  -e NODE_ENV=production \
-  -p 8000:8000 \
-  brain-api
+npm run docker:build
+# 컨테이너 실행
+npm run docker:run
 ```
 
-📋 **상세한 Docker 가이드**: [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) 참조
-🔧 **Docker 문제 해결**: [docs/DOCKER_TROUBLESHOOTING.md](./docs/DOCKER_TROUBLESHOOTING.md) 참조
-
-## 📡 API 문서화
-
-### 🔗 Swagger UI
-프로젝트에는 완전한 API 문서화가 포함되어 있습니다:
-
-```
-http://localhost:8000/api
+### 3. 로컬 개발
+```bash
+npm install
+npm run start:dev
 ```
 
-Swagger UI에서 다음과 같은 기능을 제공합니다:
-- 📋 모든 API 엔드포인트 및 스키마 정보
-- 🧪 브라우저에서 직접 API 테스트 가능
-- 📝 상세한 요청/응답 예시
-- 🏷️ API 태그별 분류
-- 📊 에러 코드 및 응답 형식 문서화
+---
 
-## 📡 API 엔드포인트
+## 📡 주요 API 예시
 
-### 1. 텍스트 요약
+### 문장 재구성
+```http
+POST /gemini/paraphrase
+Content-Type: application/json
+{
+  "text": "오늘은 날씨가 매우 좋습니다."
+}
+```
 
+### 다국어 번역
+```http
+POST /gemini/translate
+Content-Type: application/json
+{
+  "text": "안녕하세요. 오늘 날씨가 좋네요.",
+  "targetLang": "English"
+}
+```
+
+### 이미지 분석
+```http
+POST /gemini/analyze_image
+Content-Type: multipart/form-data
+image=<파일 업로드>, query="이 이미지에서 무엇을 볼 수 있나요?"
+```
+
+### 창의적 스토리 생성
+```http
+POST /gemini/generate_story
+Content-Type: application/json
+{
+  "theme": "우주 모험",
+  "keywords": ["우주선", "외계인", "모험"]
+}
+```
+
+### 텍스트 요약
 ```http
 POST /gemini/summarize
 Content-Type: application/json
-
 {
   "text": "요약할 텍스트 내용"
 }
 ```
 
-### 2. 감정 분석
-
+### 감정 분석
 ```http
 POST /gemini/analyze_sentiment
 Content-Type: application/json
-
 {
   "text": "감정을 분석할 텍스트"
 }
 ```
 
-### 3. 응답 생성
-
+### AI 응답 생성
 ```http
 POST /gemini/generate_response
 Content-Type: application/json
-
 {
-  "query": "질문 또는 요청 내용"
+  "text": "질문 또는 요청 내용"
 }
 ```
+
+### 헬스체크
+```http
+GET /health
+```
+
+---
 
 ## 🏗️ 프로젝트 구조
 
 ```
-/brain-api
+/msa-brain-gemini
 ├── src/
 │   ├── modules/
 │   │   └── gemini/
