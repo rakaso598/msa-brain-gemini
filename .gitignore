@@ -166,14 +166,16 @@ tramp
 # ==============================================
 # 🐳 Docker & Container Files
 # ==============================================
-# Docker files (optional, might want to keep some)
-.dockerignore
+# Docker files (keep main files, ignore overrides)
 docker-compose.override.yml
 docker-compose.*.yml
 !docker-compose.yml
 
-# Container data
+# Container data and volumes
 .docker/
+volumes/
+
+# Keep .dockerignore (important for builds)
 
 # ==============================================
 # ☁️ Cloud & Deployment

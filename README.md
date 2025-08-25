@@ -36,16 +36,51 @@ npm run build
 npm run start:prod
 ```
 
-### Docker로 실행
+### 🐳 Docker로 실행 (권장)
 
+#### 1. 환경변수 설정
+먼저 `.env` 파일에 실제 Gemini API 키를 설정하세요:
 ```bash
-# Docker Compose로 실행
+# .env 파일 편집
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+NODE_ENV=production
+PORT=8000
+```
+
+#### 2. Docker Compose 사용 (가장 간단)
+```bash
+# 빌드 및 실행
 docker-compose up -d
 
-# 또는 Docker만 사용
-docker build -t brain-api .
-docker run -p 8000:8000 --env-file .env brain-api
+# 로그 확인
+docker-compose logs -f brain-api
+
+# 중지
+docker-compose down
 ```
+
+#### 3. 개별 Docker 명령어
+```bash
+# 이미지 빌드
+docker build -t brain-api .
+
+# 컨테이너 실행 (.env 파일 사용)
+docker run -d \
+  --name brain-api-container \
+  --env-file .env \
+  -p 8000:8000 \
+  brain-api
+
+# 또는 환경변수 직접 지정
+docker run -d \
+  --name brain-api-container \
+  -e GEMINI_API_KEY=your_key \
+  -e NODE_ENV=production \
+  -p 8000:8000 \
+  brain-api
+```
+
+📋 **상세한 Docker 가이드**: [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) 참조
 
 ## 📡 API 문서화
 

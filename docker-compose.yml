@@ -5,16 +5,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: brain-api-container
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - .env  # .env 파일에서 환경변수 자동 로드
     environment:
       - NODE_ENV=production
     restart: always
+    volumes:
+      # 개발 시 로그 확인용 (선택사항)
+      - ./logs:/usr/src/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - brain-network
+
+networks:
+  brain-network:
+    driver: bridge
