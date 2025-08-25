@@ -65,7 +65,29 @@ NODE_ENV=production
 PORT=8000
 ```
 
-#### 2. Docker Compose 사용 (가장 간단)
+#### 2. NPM Scripts 사용 (가장 간편)
+```bash
+# 🚀 빌드하고 바로 실행
+npm run docker:dev
+
+# 또는 단계별로 실행
+npm run docker:build     # 이미지 빌드
+npm run docker:run       # 컨테이너 실행 (foreground)
+npm run docker:run:detach # 컨테이너 실행 (background)
+
+# Docker Compose 사용
+npm run docker:compose:up    # 빌드하고 백그라운드 실행
+npm run docker:compose:logs  # 로그 확인
+npm run docker:compose:down  # 중지
+
+# 유틸리티 명령어
+npm run docker:health    # 헬스 체크
+npm run docker:logs      # 컨테이너 로그 확인
+npm run docker:stop      # 컨테이너 중지 및 제거
+npm run docker:clean     # 불필요한 Docker 이미지 정리
+```
+
+#### 3. Docker Compose 사용
 ```bash
 # 빌드 및 실행
 docker-compose up -d
@@ -77,7 +99,7 @@ docker-compose logs -f brain-api
 docker-compose down
 ```
 
-#### 3. 개별 Docker 명령어
+#### 4. 개별 Docker 명령어
 ```bash
 # 이미지 빌드
 docker build -t brain-api .

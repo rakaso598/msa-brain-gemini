@@ -17,7 +17,18 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:build": "docker build -t msa-brain-gemini:latest .",
+    "docker:run": "docker run --rm --env-file .env -p 8000:8000 msa-brain-gemini:latest",
+    "docker:run:detach": "docker run -d --env-file .env -p 8000:8000 --name brain-api-container msa-brain-gemini:latest",
+    "docker:stop": "docker stop brain-api-container && docker rm brain-api-container",
+    "docker:logs": "docker logs -f brain-api-container",
+    "docker:health": "curl http://localhost:8000/health",
+    "docker:compose:up": "docker-compose up -d",
+    "docker:compose:down": "docker-compose down",
+    "docker:compose:logs": "docker-compose logs -f brain-api",
+    "docker:dev": "npm run docker:build && npm run docker:run",
+    "docker:clean": "docker system prune -f && docker image prune -f"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
