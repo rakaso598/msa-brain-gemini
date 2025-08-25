@@ -81,6 +81,7 @@ docker run -d \
 ```
 
 📋 **상세한 Docker 가이드**: [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) 참조
+🔧 **Docker 문제 해결**: [docs/DOCKER_TROUBLESHOOTING.md](./docs/DOCKER_TROUBLESHOOTING.md) 참조
 
 ## 📡 API 문서화
 
