@@ -1,24 +1,42 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { GeminiService } from './gemini.service';
+import {
+  SummarizeDto,
+  AnalyzeSentimentDto,
+  GenerateResponseDto,
+  SummarizeResponseDto,
+  SentimentResponseDto,
+  GenerateResponseResponseDto,
+  ErrorResponseDto
+} from './dto/gemini.dto';
 
-export interface SummarizeDto {
-  text: string;
-}
-
-export interface AnalyzeSentimentDto {
-  text: string;
-}
-
-export interface GenerateResponseDto {
-  query: string;
-}
-
+@ApiTags('gemini')
 @Controller('gemini')
 export class GeminiController {
   constructor(private readonly geminiService: GeminiService) { }
 
   @Post('summarize')
-  async summarizeText(@Body() body: SummarizeDto) {
+  @ApiOperation({ 
+    summary: '텍스트 요약 및 키워드 추출',
+    description: '긴 텍스트를 핵심 내용 위주로 3줄 요약하고, 관련 키워드 3개를 추출합니다.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '텍스트 요약 성공',
+    type: SummarizeResponseDto
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: '잘못된 요청 (텍스트 누락)',
+    type: ErrorResponseDto
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Gemini API 호출 오류',
+    type: ErrorResponseDto
+  })
+  async summarizeText(@Body() body: SummarizeDto): Promise<SummarizeResponseDto> {
     const { text } = body;
 
     if (!text || text.trim().length === 0) {
@@ -41,7 +59,26 @@ export class GeminiController {
   }
 
   @Post('analyze_sentiment')
-  async analyzeSentiment(@Body() body: AnalyzeSentimentDto) {
+  @ApiOperation({ 
+    summary: '감정 분석',
+    description: '텍스트의 감정을 분석하여 긍정, 부정, 중립 중 하나로 분류하고 그 이유를 설명합니다.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '감정 분석 성공',
+    type: SentimentResponseDto
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: '잘못된 요청 (텍스트 누락)',
+    type: ErrorResponseDto
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Gemini API 호출 오류',
+    type: ErrorResponseDto
+  })
+  async analyzeSentiment(@Body() body: AnalyzeSentimentDto): Promise<SentimentResponseDto> {
     const { text } = body;
 
     if (!text || text.trim().length === 0) {
@@ -64,7 +101,26 @@ export class GeminiController {
   }
 
   @Post('generate_response')
-  async generateResponse(@Body() body: GenerateResponseDto) {
+  @ApiOperation({ 
+    summary: '응답 생성',
+    description: '사용자의 질문이나 요청에 대해 도움이 되는 답변을 생성합니다.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '응답 생성 성공',
+    type: GenerateResponseResponseDto
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: '잘못된 요청 (쿼리 누락)',
+    type: ErrorResponseDto
+  })
+  @ApiResponse({ 
+    status: 500, 
+    description: 'Gemini API 호출 오류',
+    type: ErrorResponseDto
+  })
+  async generateResponse(@Body() body: GenerateResponseDto): Promise<GenerateResponseResponseDto> {
     const { query } = body;
 
     if (!query || query.trim().length === 0) {
