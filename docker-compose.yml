@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: brain-api-container
     ports:
-      - "8000:8000"
+      - "8080:8080"
     env_file:
       - .env  # .env 파일에서 환경변수 자동 로드
     environment:
@@ -15,7 +15,7 @@ services:
       # 개발 시 로그 확인용 (선택사항)
       - ./logs:/usr/src/app/logs
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -45,7 +45,7 @@ COPY --from=builder --chown=nestjs:nodejs /usr/src/app/package*.json ./
 USER nestjs
 
 # 포트 노출
-EXPOSE 8000
+EXPOSE 8080
 
 # 환경 설정
 ENV NODE_ENV=production
