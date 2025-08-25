@@ -28,7 +28,9 @@
     "docker:compose:down": "docker-compose down",
     "docker:compose:logs": "docker-compose logs -f brain-api",
     "docker:dev": "npm run docker:build && npm run docker:run",
-    "docker:clean": "docker system prune -f && docker image prune -f"
+    "docker:clean": "docker system prune -f && docker image prune -f",
+    "docker:tag:hub": "docker tag msa-brain-gemini:latest rakaso598/msa-brain-gemini:latest",
+    "docker:push:hub": "npm run docker:tag:hub && docker push rakaso598/msa-brain-gemini:latest"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
