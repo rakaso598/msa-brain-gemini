@@ -2,6 +2,7 @@ import { Module, Controller, Get } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { GeminiModule } from './modules/gemini/gemini.module';
 import { ApiKeyGuard } from './guards/api-key.guard';
 
@@ -65,6 +66,23 @@ class AppController {
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 60000, // 1분 (60초)
+        limit: 10, // 1분에 최대 10개 요청
+      },
+      {
+        name: 'medium',
+        ttl: 600000, // 10분
+        limit: 50, // 10분에 최대 50개 요청
+      },
+      {
+        name: 'long',
+        ttl: 3600000, // 1시간
+        limit: 100, // 1시간에 최대 100개 요청
+      },
+    ]),
     GeminiModule,
   ],
   controllers: [AppController],
@@ -72,6 +90,10 @@ class AppController {
     {
       provide: APP_GUARD,
       useClass: ApiKeyGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

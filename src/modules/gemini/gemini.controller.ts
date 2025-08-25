@@ -10,6 +10,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiSecurity } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { GeminiService } from './gemini.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -18,11 +19,13 @@ import { TextDto, TranslationDto, StoryDto } from './dto/gemini.dto';
 @ApiTags('gemini')
 @ApiSecurity('x-api-key')
 @Controller('gemini')
+@Throttle({ default: { limit: 5, ttl: 60000 } }) // Gemini API는 더 엄격하게: 1분에 5개 요청
 @UsePipes(new ValidationPipe({ transform: true }))
 export class GeminiController {
   constructor(private readonly geminiService: GeminiService) {}
 
   @Post('summarize')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 요약: 1분에 3개
   @ApiOperation({ summary: '텍스트 요약 및 키워드 추출', description: '긴 텍스트를 3줄로 요약하고 관련 키워드를 추출합니다.' })
   @ApiResponse({ status: 200, description: '요약 성공' })
   async summarizeText(@Body() data: TextDto) {
@@ -31,6 +34,7 @@ export class GeminiController {
   }
 
   @Post('analyze_sentiment')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 감정분석: 1분에 5개
   @ApiOperation({ summary: '감정 분석', description: '텍스트의 감정을 긍정/부정/중립으로 분석합니다.' })
   @ApiResponse({ status: 200, description: '감정 분석 성공' })
   async analyzeSentiment(@Body() data: TextDto) {
@@ -39,6 +43,7 @@ export class GeminiController {
   }
 
   @Post('generate_response')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // AI 응답생성: 1분에 3개 (비용이 높음)
   @ApiOperation({ summary: 'AI 응답 생성', description: '사용자 질문에 대한 AI 응답을 생성합니다.' })
   @ApiResponse({ status: 200, description: '응답 생성 성공' })
   async generateResponse(@Body() data: TextDto) {
@@ -48,6 +53,7 @@ export class GeminiController {
 
   // 새로운 기능: 문장 바꾸기/재구성
   @Post('paraphrase')
+  @Throttle({ default: { limit: 4, ttl: 60000 } }) // 문장재구성: 1분에 4개
   @ApiOperation({ summary: '문장 재구성', description: '입력 텍스트를 같은 의미로 다른 표현으로 바꿉니다.' })
   @ApiResponse({ status: 200, description: '문장 재구성 성공' })
   async paraphraseText(@Body() data: TextDto) {
@@ -57,6 +63,7 @@ export class GeminiController {
 
   // 새로운 기능: 다국어 번역
   @Post('translate')
+  @Throttle({ default: { limit: 4, ttl: 60000 } }) // 번역: 1분에 4개
   @ApiOperation({ summary: '다국어 번역', description: '텍스트를 지정된 언어로 번역합니다.' })
   @ApiResponse({ status: 200, description: '번역 성공' })
   async translateText(@Body() data: TranslationDto) {
@@ -66,6 +73,7 @@ export class GeminiController {
 
   // 새로운 기능: 이미지 내용 분석 (멀티모달)
   @Post('analyze_image')
+  @Throttle({ default: { limit: 2, ttl: 60000 } }) // 이미지분석: 1분에 2개 (가장 비용이 높음)
   @ApiOperation({ summary: '이미지 분석', description: '업로드된 이미지를 분석하고 질문에 답변합니다.' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -95,6 +103,7 @@ export class GeminiController {
 
   // 새로운 기능: 창의적 콘텐츠 생성
   @Post('generate_story')
+  @Throttle({ default: { limit: 2, ttl: 60000 } }) // 스토리생성: 1분에 2개 (긴 콘텐츠 생성이므로 비용이 높음)
   @ApiOperation({ summary: '창의적 스토리 생성', description: '주제와 키워드로 창의적인 이야기를 생성합니다.' })
   @ApiResponse({ status: 200, description: '스토리 생성 성공' })
   async generateStory(@Body() data: StoryDto) {
