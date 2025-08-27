@@ -14,7 +14,7 @@ import { Throttle } from '@nestjs/throttler';
 import { GeminiService } from './gemini.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { TextDto, TranslationDto, StoryDto } from './dto/gemini.dto';
+import { TextDto, TranslationDto, StoryDto, PortfolioAnalysisDto } from './dto/gemini.dto';
 
 @ApiTags('gemini')
 @ApiSecurity('x-api-key')
@@ -22,7 +22,7 @@ import { TextDto, TranslationDto, StoryDto } from './dto/gemini.dto';
 @Throttle({ default: { limit: 5, ttl: 60000 } }) // Gemini API는 더 엄격하게: 1분에 5개 요청
 @UsePipes(new ValidationPipe({ transform: true }))
 export class GeminiController {
-  constructor(private readonly geminiService: GeminiService) {}
+  constructor(private readonly geminiService: GeminiService) { }
 
   @Post('summarize')
   @Throttle({ default: { limit: 3, ttl: 60000 } }) // 요약: 1분에 3개
@@ -109,5 +109,53 @@ export class GeminiController {
   async generateStory(@Body() data: StoryDto) {
     const story = await this.geminiService.generateStory(data);
     return { story };
+  }
+
+  // 새로운 기능: 포트폴리오 분석
+  @Post('analyze_portfolio')
+  @Throttle({ default: { limit: 2, ttl: 60000 } }) // 포트폴리오 분석: 1분에 2개 (복잡한 분석이므로 제한적)
+  @ApiOperation({
+    summary: '포트폴리오 종합 분석',
+    description: '사용자의 GitHub 저장소, 블로그, 이력서를 기반으로 종합적인 포트폴리오 분석을 수행합니다.'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '포트폴리오 분석 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: '포트폴리오 전반적 평가' },
+        strengths: { type: 'array', items: { type: 'string' }, description: '강점 목록' },
+        weaknesses: { type: 'array', items: { type: 'string' }, description: '약점 목록' },
+        technicalFeedback: {
+          type: 'object',
+          properties: {
+            codeReview: { type: 'string', description: '코드 리뷰 피드백' },
+            bestPractices: { type: 'string', description: '베스트 프랙티스 제안' }
+          }
+        },
+        documentationFeedback: {
+          type: 'object',
+          properties: {
+            readmeReview: { type: 'string', description: 'README 문서 피드백' },
+            blogReview: { type: 'string', description: '블로그 글 피드백' }
+          }
+        },
+        overallScore: { type: 'number', description: '전체 점수 (0-100)' },
+        nextSteps: { type: 'array', items: { type: 'string' }, description: '다음 단계 제안' }
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: '잘못된 요청 (필수 필드 누락 또는 잘못된 URL)' })
+  async analyzePortfolio(@Body() data: PortfolioAnalysisDto) {
+    try {
+      const analysis = await this.geminiService.analyzePortfolio(data);
+      return analysis;
+    } catch (error) {
+      throw new HttpException(
+        error.message || '포트폴리오 분석 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
