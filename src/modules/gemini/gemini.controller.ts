@@ -91,13 +91,7 @@ export class GeminiController {
     if (!file || !query) {
       throw new HttpException('이미지와 쿼리 필드가 필요합니다.', HttpStatus.BAD_REQUEST);
     }
-    const imagePart = {
-      inlineData: {
-        data: Buffer.from(file.buffer).toString('base64'),
-        mimeType: file.mimetype,
-      },
-    };
-    const result = await this.geminiService.analyzeImage(imagePart, query);
+    const result = await this.geminiService.analyzeImage(file, query);
     return { result };
   }
 
