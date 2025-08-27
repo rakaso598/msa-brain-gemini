@@ -10,7 +10,7 @@
 </details>
 
 <details>
-  <summary><h2>🍎 배포 Swagger 문서에서 실제 API 요청 보내보기</h2></summary>
+  <summary><h2>📖 배포 Swagger 문서에서 실제 API 요청 보내보기</h2></summary>
   
   <img width="600" alt="image" src="docs/배포Swagger문서에서실제API요청보내보기.png" />
   
