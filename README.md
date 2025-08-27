@@ -5,42 +5,56 @@
 <details>
   <summary><h2>📜 GCP 배포 URL로 Swagger 문서 접속</h2></summary>
   
-  <img width="794" height="652" alt="image" src="docs/GCP배포URL로Swagger문서접속.png" />
+  <img width="600" alt="image" src="docs/GCP배포URL로Swagger문서접속.png" />
   
 </details>
 
 <details>
   <summary><h2>🍎 배포 Swagger 문서에서 실제 API 요청 보내보기</h2></summary>
   
-  <img width="1264" height="800" alt="image" src="docs/배포Swagger문서에서실제API요청보내보기.png" />
+  <img width="600" alt="image" src="docs/배포Swagger문서에서실제API요청보내보기.png" />
   
 </details>
 
 <details>
   <summary><h2>💿 Docker Desktop에서 배포할 이미지 실행시켜보기</h2></summary>
   
-  <img width="877" height="637" alt="image" src="docs/DockerDesktop에서배포할이미지실행시켜보기.png" />
+  <img width="600" alt="image" src="docs/DockerDesktop에서배포할이미지실행시켜보기.png" />
   
 </details>
 
 <details>
   <summary><h2>🧾 GCP에서 이미지 빌드 기록 보기</h2></summary>
   
-  <img width="735" height="454" alt="image" src="docs/GCP에서이미지빌드기록보기.png" />
+  <img width="600" alt="image" src="docs/GCP에서이미지빌드기록보기.png" />
   
 </details>
 
 <details>
   <summary><h2>☁️ GCP 배포 시 포트 및 환경변수 설정</h2></summary>
   
-  <img width="782" height="709" alt="image" src="docs/GCP배포시포트및환경변수설정.png" />
+  <img width="600" alt="image" src="docs/GCP배포시포트및환경변수설정.png" />
   
 </details>
 
 <details>
   <summary><h2>🧳 GCP 배포 시 GitHub 레포지토리와 연결하기</h2></summary>
   
-  <img width="1410" height="832" alt="image" src="docs/GCP배포시GitHub레포지토리와연결하기.png" />
+  <img width="600" alt="image" src="docs/GCP배포시GitHub레포지토리와연결하기.png" />
+  
+</details>
+
+<details>
+  <summary><h2>💽 포트폴리오 종합 분석 API (GitHub PAT, Cheerio)</h2></summary>
+  
+  <img width="600" alt="image" src="docs/포트폴리오종합분석API.png" />
+  
+</details>
+
+<details>
+  <summary><h2>🏹 포트폴리오 종합 분석 - 실제 요청 및 응답 (GitHub PAT, Cheerio)</h2></summary>
+  
+  <img width="600" alt="image" src="docs/포트폴리오종합분석실제요청및응답.png" />
   
 </details>
 
