@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GoogleGenerativeAI, Part } from '@google/generative-ai';
-import { TranslationDto, StoryDto } from './dto/gemini.dto';
+import { TranslationDto, StoryDto, PortfolioAnalysisDto } from './dto/gemini.dto';
 
 @Injectable()
 export class GeminiService {
@@ -141,6 +141,78 @@ export class GeminiService {
       return result.response.text();
     } catch (error) {
       throw new InternalServerErrorException(`Gemini API 호출 중 오류 발생: ${error.message}`);
+    }
+  }
+
+  // 새로운 기능: 포트폴리오 분석
+  async analyzePortfolio(data: PortfolioAnalysisDto): Promise<any> {
+    if (!data.githubUrl) {
+      throw new Error('GitHub URL은 필수입니다.');
+    }
+
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // 포트폴리오 분석을 위한 상세한 프롬프트
+    const prompt = `다음 포트폴리오 정보를 기반으로 종합적인 분석을 수행하고 JSON 형식으로 응답해주세요.
+
+분석 대상:
+- GitHub Repository: ${data.githubUrl}
+${data.blogUrl ? `- Blog Post: ${data.blogUrl}` : ''}
+${data.resumeText ? `- Resume: ${data.resumeText}` : ''}
+
+다음 형식의 JSON으로 응답해주세요:
+{
+  "summary": "포트폴리오의 전반적인 평가와 강점 요약 (2-3문장)",
+  "strengths": ["강점1", "강점2", "강점3"],
+  "weaknesses": ["약점1", "약점2", "약점3"],
+  "technicalFeedback": {
+    "codeReview": "코드 구조 및 가독성에 대한 구체적인 피드백",
+    "bestPractices": "적용하면 좋을 베스트 프랙티스 제안"
+  },
+  "documentationFeedback": {
+    "readmeReview": "README 문서의 내용 및 구성에 대한 피드백",
+    "blogReview": "블로그 글의 논리 전개 및 내용에 대한 피드백 (블로그 URL이 제공된 경우만)"
+  },
+  "overallScore": 85,
+  "nextSteps": ["개선사항1", "개선사항2", "개선사항3"]
+}
+
+분석 시 고려사항:
+1. 코드의 구조, 가독성, 베스트 프랙티스 준수
+2. 문서화 품질 (README, 주석 등)
+3. 프로젝트의 완성도와 실용성
+4. 기술 스택 활용의 적절성
+5. 전반적인 개발 역량
+
+JSON 형식만 응답하고 다른 텍스트는 포함하지 마세요.`;
+
+    try {
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
+
+      // JSON 파싱 시도
+      try {
+        return JSON.parse(responseText);
+      } catch (parseError) {
+        // JSON 파싱 실패 시 기본 구조로 응답
+        return {
+          summary: responseText,
+          strengths: ["분석된 내용을 확인해주세요"],
+          weaknesses: ["추가 정보가 필요합니다"],
+          technicalFeedback: {
+            codeReview: "상세 분석을 위해 추가 정보가 필요합니다",
+            bestPractices: "프로젝트 구조를 더 자세히 확인해주세요"
+          },
+          documentationFeedback: {
+            readmeReview: "문서화 상태를 확인해주세요",
+            blogReview: data.blogUrl ? "블로그 내용을 확인해주세요" : null
+          },
+          overallScore: 50,
+          nextSteps: ["프로젝트 정보를 더 자세히 제공해주세요"]
+        };
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(`포트폴리오 분석 중 오류 발생: ${error.message}`);
     }
   }
 }
