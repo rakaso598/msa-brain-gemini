@@ -108,7 +108,7 @@ export class GeminiController {
 
   // 새로운 기능: 포트폴리오 분석
   @Post('analyze_portfolio')
-  @Throttle({ default: { limit: 2, ttl: 60000 } }) // 포트폴리오 분석: 1분에 2개 (복잡한 분석이므로 제한적)
+  @Throttle({ default: { limit: 1, ttl: 60000 } }) // 포트폴리오 분석: 1분에 1개 (Gemini API + GitHub API + 웹스크래핑으로 리소스 집약적)
   @ApiOperation({
     summary: '포트폴리오 종합 분석',
     description: '사용자의 GitHub 저장소, 블로그, 이력서를 기반으로 종합적인 포트폴리오 분석을 수행합니다.'
