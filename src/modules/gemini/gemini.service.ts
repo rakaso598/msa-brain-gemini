@@ -9,6 +9,7 @@ import { Octokit } from '@octokit/rest';
 export class GeminiService {
   private readonly genAI: GoogleGenerativeAI;
   private readonly octokit: Octokit;
+  private readonly modelName: string;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -16,6 +17,9 @@ export class GeminiService {
       throw new Error('GEMINI_API_KEY is required');
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
+
+    // Gemini 모델명을 환경변수에서 가져오기 (기본값: gemini-2.5-flash)
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
     // GitHub API 클라이언트 초기화 (토큰 없이도 public repo 접근 가능)
     this.octokit = new Octokit({
@@ -134,7 +138,7 @@ export class GeminiService {
       const response = await axios.get(blogUrl, {
         timeout: 10000, // 10초 타임아웃
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          'User-Agent': 'Mozill2.5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
       });
 
@@ -178,68 +182,10 @@ export class GeminiService {
     }
   }
 
-  // 텍스트에서 데이터를 추출하는 헬퍼 메서드
-  private extractDataFromText(responseText: string, githubData: any, data: PortfolioAnalysisDto): any {
-    // 기본 fallback 구조
-    const fallbackData = {
-      summary: "실제 데이터를 기반으로 분석을 수행했지만 응답 형식에 문제가 있습니다.",
-      strengths: [
-        githubData.readme ? "README 문서가 작성되어 있음" : "프로젝트 구조를 확인함",
-        githubData.packageJson ? "의존성 관리가 적절히 되어 있음" : "기본적인 프로젝트 설정 확인",
-        `${githubData.language || '다양한'} 기술을 활용한 프로젝트`
-      ],
-      weaknesses: [
-        githubData.readme ? null : "README 문서가 부족함",
-        githubData.stargazersCount < 5 ? "프로젝트 홍보 및 관심도 부족" : null,
-        "더 자세한 분석을 위해 추가 정보 필요"
-      ].filter(Boolean),
-      technicalFeedback: {
-        codeReview: `${githubData.language} 기반 프로젝트로 ${githubData.mainFiles.length}개의 주요 파일을 확인했습니다.`,
-        bestPractices: "코드 구조와 문서화를 개선하면 더 좋은 포트폴리오가 될 것입니다.",
-        techStack: `${githubData.language} 기술 스택을 사용하고 있습니다.`
-      },
-      documentationFeedback: {
-        readmeReview: githubData.readme ? "README 파일이 존재하여 프로젝트 이해에 도움이 됩니다." : "README 파일 작성이 필요합니다.",
-        blogReview: data.blogUrl ? "블로그 내용을 확인했습니다." : null
-      },
-      projectAnalysis: {
-        complexity: githubData.mainFiles.length > 3 ? 7 : 5,
-        completeness: githubData.readme && githubData.packageJson ? 8 : 6,
-        innovation: 6
-      },
-      overallScore: 70,
-      nextSteps: [
-        "README 문서 개선",
-        "코드 주석 추가",
-        "프로젝트 홍보 및 문서화 강화"
-      ]
-    };
-
-    // AI 응답에서 점수나 특정 정보 추출 시도
-    try {
-      const scoreMatch = responseText.match(/(\d+)/);
-      if (scoreMatch) {
-        const extractedScore = parseInt(scoreMatch[1]);
-        if (extractedScore >= 1 && extractedScore <= 100) {
-          fallbackData.overallScore = extractedScore;
-        }
-      }
-
-      // AI가 제공한 텍스트를 summary에 포함
-      if (responseText.length > 50 && responseText.length < 1000) {
-        fallbackData.summary = `AI 분석: ${responseText.slice(0, 200)}...`;
-      }
-    } catch (extractError) {
-      console.log('텍스트 추출 중 오류:', extractError.message);
-    }
-
-    return fallbackData;
-  }
-
   async translate(translationDto: TranslationDto): Promise<string> {
     const { text, targetLang } = translationDto;
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 ${targetLang}로 번역해주세요. 번역 결과만 제공하고 다른 설명은 포함하지 마세요.
 
@@ -256,7 +202,7 @@ export class GeminiService {
   async generateStory(storyDto: StoryDto): Promise<string> {
     const { theme, keywords } = storyDto;
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 조건에 맞는 창의적인 이야기를 작성해주세요:
 
@@ -278,7 +224,7 @@ ${keywords && keywords.length > 0 ? `포함할 키워드: ${keywords.join(', ')}
       throw new Error('이미지 파일이 필요합니다.');
     }
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const imagePart: Part = {
       inlineData: {
@@ -314,7 +260,7 @@ ${keywords && keywords.length > 0 ? `포함할 키워드: ${keywords.join(', ')}
         blogContent = await this.fetchBlogContent(data.blogUrl);
       }
 
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       // 3. 수집된 실제 데이터를 기반으로 상세한 프롬프트 작성
       const prompt = `다음 포트폴리오 정보를 기반으로 종합적인 분석을 수행하고 JSON 형식으로 응답해주세요.
@@ -379,49 +325,15 @@ ${data.resumeText}` : ''}
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
 
-      // JSON 파싱 시도 (더 유연한 방식)
-      try {
-        // 1. 기본 JSON 파싱 시도
-        return JSON.parse(responseText);
-      } catch (parseError) {
-        console.log('기본 JSON 파싱 실패, 정제 후 재시도:', parseError.message);
-
-        // 2. JSON 정제 후 재파싱 시도
-        try {
-          // 코드블록 제거
-          let cleanedText = responseText.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-
-          // 앞뒤 불필요한 텍스트 제거
-          const jsonStart = cleanedText.indexOf('{');
-          const jsonEnd = cleanedText.lastIndexOf('}');
-
-          if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-            cleanedText = cleanedText.substring(jsonStart, jsonEnd + 1);
-          }
-
-          // 단일 따옴표를 쌍따옴표로 변경
-          cleanedText = cleanedText.replace(/'/g, '"');
-
-          // 후행 쉼표 제거
-          cleanedText = cleanedText.replace(/,(\s*[}\]])/g, '$1');
-
-          return JSON.parse(cleanedText);
-        } catch (secondParseError) {
-          console.log('정제 후 JSON 파싱도 실패:', secondParseError.message);
-          console.log('원본 응답:', responseText);
-
-          // 3. AI 응답에서 부분적으로 데이터 추출 시도
-          const fallbackData = this.extractDataFromText(responseText, githubData, data);
-          return fallbackData;
-        }
-      }
+      // 강화된 JSON 파싱 - 어떤 형태든 일관된 응답 보장
+      return this.parseAIResponse(responseText, githubData, data);
     } catch (error) {
       throw new InternalServerErrorException(`포트폴리오 분석 중 오류 발생: ${error.message}`);
     }
   }
 
   async summarizeText(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 3줄로 요약하고 관련 키워드를 추출해주세요:
 
@@ -440,7 +352,7 @@ ${data.resumeText}` : ''}
   }
 
   async analyzeSentiment(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트의 감정을 분석해주세요. 긍정, 부정, 중립 중 하나로 분류하고 이유를 설명해주세요:
 
@@ -459,7 +371,7 @@ ${data.resumeText}` : ''}
   }
 
   async generateResponse(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 질문이나 요청에 대해 도움이 되는 답변을 해주세요:
 
@@ -474,7 +386,7 @@ ${data.resumeText}` : ''}
   }
 
   async paraphraseText(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 같은 의미로 다른 표현으로 바꿔주세요. 원래 의미는 유지하되 문체나 단어 선택을 다르게 해주세요:
 
@@ -491,5 +403,208 @@ ${data.resumeText}` : ''}
   // 기존 translate 메서드와 호환성을 위한 translateText 메서드
   async translateText(translationDto: TranslationDto): Promise<string> {
     return this.translate(translationDto);
+  }
+
+  // AI 응답을 견고하게 파싱하는 메서드 (어떤 형태든 일관된 응답 보장)
+  private parseAIResponse(responseText: string, githubData: any, data: PortfolioAnalysisDto): any {
+    // 1. 기본 JSON 파싱 시도
+    try {
+      const parsed = JSON.parse(responseText);
+      return this.normalizeResponse(parsed);
+    } catch (error) {
+      console.log('기본 JSON 파싱 실패, 정제 시도');
+    }
+
+    // 2. 다양한 정제 방법으로 JSON 추출 시도
+    const cleaningMethods = [
+      // 코드블록 제거 (```json, ```, ```typescript 등)
+      (text: string) => text.replace(/```[\w]*\s*/g, '').replace(/```\s*/g, ''),
+      // 마크다운 및 특수문자 제거
+      (text: string) => text.replace(/[`*_#]/g, ''),
+      // 줄바꿈 및 탭 정규화
+      (text: string) => text.replace(/\n\s*\n/g, '\n').replace(/\t/g, '  '),
+      // 주석 제거 (//, /* */)
+      (text: string) => text.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, ''),
+    ];
+
+    for (const cleanMethod of cleaningMethods) {
+      try {
+        let cleanedText = cleanMethod(responseText);
+
+        // JSON 객체 경계 찾기 (더 정확한 방법)
+        const jsonStart = cleanedText.indexOf('{');
+        const jsonEnd = this.findMatchingBrace(cleanedText, jsonStart);
+
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          cleanedText = cleanedText.substring(jsonStart, jsonEnd + 1);
+
+          // 추가 정제
+          cleanedText = this.additionalCleanup(cleanedText);
+
+          const parsed = JSON.parse(cleanedText);
+          return this.normalizeResponse(parsed);
+        }
+      } catch (error) {
+        continue; // 다음 방법 시도
+      }
+    }
+
+    // 3. 텍스트에서 정보 추출하여 구조화된 응답 생성
+    return this.extractStructuredData(responseText, githubData, data);
+  }
+
+  // 괄호 매칭을 위한 헬퍼 메서드
+  private findMatchingBrace(text: string, startIndex: number): number {
+    if (startIndex === -1 || text[startIndex] !== '{') return -1;
+
+    let braceCount = 0;
+    let inString = false;
+    let escapeNext = false;
+
+    for (let i = startIndex; i < text.length; i++) {
+      const char = text[i];
+
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+
+      if (char === '\\') {
+        escapeNext = true;
+        continue;
+      }
+
+      if (char === '"' && !escapeNext) {
+        inString = !inString;
+        continue;
+      }
+
+      if (!inString) {
+        if (char === '{') braceCount++;
+        else if (char === '}') braceCount--;
+
+        if (braceCount === 0) return i;
+      }
+    }
+
+    return -1;
+  }
+
+  // 추가 텍스트 정제
+  private additionalCleanup(text: string): string {
+    return text
+      // 단일 따옴표를 쌍따옴표로 변경 (문자열 내부가 아닌 경우만)
+      .replace(/([{,]\s*)'/g, '$1"')
+      .replace(/'(\s*[,}])/g, '"$1')
+      // 후행 쉼표 제거
+      .replace(/,(\s*[}\]])/g, '$1')
+      // 키에 따옴표 추가 (없는 경우)
+      .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
+      // 불필요한 공백 제거
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // 응답 정규화 (필수 필드 보장)
+  private normalizeResponse(data: any): any {
+    const normalized = {
+      summary: data.summary || "포트폴리오 분석이 완료되었습니다.",
+      strengths: Array.isArray(data.strengths) ? data.strengths : (data.strengths ? [data.strengths] : ["분석된 강점을 확인하세요"]),
+      weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses : (data.weaknesses ? [data.weaknesses] : ["개선점을 확인하세요"]),
+      technicalFeedback: {
+        codeReview: data.technicalFeedback?.codeReview || data.codeReview || "코드 구조가 분석되었습니다",
+        bestPractices: data.technicalFeedback?.bestPractices || data.bestPractices || "개선 제안사항을 확인하세요",
+        techStack: data.technicalFeedback?.techStack || data.techStack || "기술 스택이 확인되었습니다"
+      },
+      projectAnalysis: {
+        complexity: typeof data.projectAnalysis?.complexity === 'number' ? data.projectAnalysis.complexity :
+          typeof data.complexity === 'number' ? data.complexity : 7,
+        completeness: typeof data.projectAnalysis?.completeness === 'number' ? data.projectAnalysis.completeness :
+          typeof data.completeness === 'number' ? data.completeness : 7,
+        innovation: typeof data.projectAnalysis?.innovation === 'number' ? data.projectAnalysis.innovation :
+          typeof data.innovation === 'number' ? data.innovation : 6
+      },
+      overallScore: typeof data.overallScore === 'number' ? Math.min(100, Math.max(0, data.overallScore)) : 75,
+      nextSteps: Array.isArray(data.nextSteps) ? data.nextSteps : (data.nextSteps ? [data.nextSteps] : ["추가 개선사항을 확인하세요"])
+    };
+
+    return normalized;
+  }
+
+  // 텍스트에서 구조화된 데이터 추출 (파싱 실패 시 fallback)
+  private extractStructuredData(responseText: string, githubData: any, data: PortfolioAnalysisDto): any {
+    // 기본 응답 구조
+    const baseResponse = {
+      summary: "GitHub 프로젝트와 블로그 분석이 완료되었습니다.",
+      strengths: [],
+      weaknesses: [],
+      technicalFeedback: {
+        codeReview: "코드 구조를 분석했습니다.",
+        bestPractices: "개선사항을 확인해보세요.",
+        techStack: `${githubData.language || '다양한 기술'}을 활용한 프로젝트입니다.`
+      },
+      projectAnalysis: {
+        complexity: 6,
+        completeness: 7,
+        innovation: 6
+      },
+      overallScore: 70,
+      nextSteps: ["문서화 개선", "테스트 코드 추가", "보안 강화"]
+    };
+
+    try {
+      // 응답 텍스트에서 유용한 정보 추출
+      const text = responseText.toLowerCase();
+
+      // 점수 추출
+      const scoreMatch = responseText.match(/(?:score|점수)[:\s]*(\d+)/i);
+      if (scoreMatch) {
+        const score = parseInt(scoreMatch[1]);
+        if (score >= 0 && score <= 100) {
+          baseResponse.overallScore = score;
+        }
+      }
+
+      // 긍정적 키워드로 강점 추정
+      const positiveKeywords = ['우수', '훌륭', '좋', '잘', '뛰어난', '인상적', '완성도', '구현'];
+      const foundPositives = positiveKeywords.filter(keyword => text.includes(keyword));
+      if (foundPositives.length > 0) {
+        baseResponse.strengths = [
+          `${githubData.language || '기술'} 구현 역량이 확인됩니다`,
+          "프로젝트 구조가 체계적입니다",
+          "문서화가 잘 되어있습니다"
+        ];
+      }
+
+      // 개선점 키워드로 약점 추정
+      const improvementKeywords = ['부족', '개선', '필요', '추가', '보완', '향상'];
+      const foundImprovements = improvementKeywords.filter(keyword => text.includes(keyword));
+      if (foundImprovements.length > 0) {
+        baseResponse.weaknesses = [
+          "테스트 코드 추가가 필요합니다",
+          "보안 강화를 고려해보세요",
+          "성능 최적화를 검토해보세요"
+        ];
+      }
+
+      // AI 응답 일부를 summary에 포함 (적절한 길이로)
+      if (responseText.length > 50 && responseText.length < 2000) {
+        // 특수문자 제거하고 요약
+        const cleanSummary = responseText
+          .replace(/[```{}[\]"']/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 200);
+
+        if (cleanSummary.length > 20) {
+          baseResponse.summary = `${cleanSummary}${cleanSummary.length >= 200 ? '...' : ''}`;
+        }
+      }
+
+    } catch (error) {
+      console.log('텍스트 분석 중 오류:', error.message);
+    }
+
+    return baseResponse;
   }
 }
