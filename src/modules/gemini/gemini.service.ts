@@ -9,6 +9,7 @@ import { Octokit } from '@octokit/rest';
 export class GeminiService {
   private readonly genAI: GoogleGenerativeAI;
   private readonly octokit: Octokit;
+  private readonly modelName: string;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -16,6 +17,9 @@ export class GeminiService {
       throw new Error('GEMINI_API_KEY is required');
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
+
+    // Gemini 모델명을 환경변수에서 가져오기 (기본값: gemini-2.5-flash)
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
     // GitHub API 클라이언트 초기화 (토큰 없이도 public repo 접근 가능)
     this.octokit = new Octokit({
@@ -134,7 +138,7 @@ export class GeminiService {
       const response = await axios.get(blogUrl, {
         timeout: 10000, // 10초 타임아웃
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          'User-Agent': 'Mozill2.5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
       });
 
@@ -181,7 +185,7 @@ export class GeminiService {
   async translate(translationDto: TranslationDto): Promise<string> {
     const { text, targetLang } = translationDto;
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 ${targetLang}로 번역해주세요. 번역 결과만 제공하고 다른 설명은 포함하지 마세요.
 
@@ -198,7 +202,7 @@ export class GeminiService {
   async generateStory(storyDto: StoryDto): Promise<string> {
     const { theme, keywords } = storyDto;
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 조건에 맞는 창의적인 이야기를 작성해주세요:
 
@@ -220,7 +224,7 @@ ${keywords && keywords.length > 0 ? `포함할 키워드: ${keywords.join(', ')}
       throw new Error('이미지 파일이 필요합니다.');
     }
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const imagePart: Part = {
       inlineData: {
@@ -256,7 +260,7 @@ ${keywords && keywords.length > 0 ? `포함할 키워드: ${keywords.join(', ')}
         blogContent = await this.fetchBlogContent(data.blogUrl);
       }
 
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       // 3. 수집된 실제 데이터를 기반으로 상세한 프롬프트 작성
       const prompt = `다음 포트폴리오 정보를 기반으로 종합적인 분석을 수행하고 JSON 형식으로 응답해주세요.
@@ -329,7 +333,7 @@ ${data.resumeText}` : ''}
   }
 
   async summarizeText(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 3줄로 요약하고 관련 키워드를 추출해주세요:
 
@@ -348,7 +352,7 @@ ${data.resumeText}` : ''}
   }
 
   async analyzeSentiment(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트의 감정을 분석해주세요. 긍정, 부정, 중립 중 하나로 분류하고 이유를 설명해주세요:
 
@@ -367,7 +371,7 @@ ${data.resumeText}` : ''}
   }
 
   async generateResponse(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 질문이나 요청에 대해 도움이 되는 답변을 해주세요:
 
@@ -382,7 +386,7 @@ ${data.resumeText}` : ''}
   }
 
   async paraphraseText(text: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
     const prompt = `다음 텍스트를 같은 의미로 다른 표현으로 바꿔주세요. 원래 의미는 유지하되 문체나 단어 선택을 다르게 해주세요:
 
