@@ -17,7 +17,8 @@ import { memoryStorage } from 'multer';
 import { TextDto, TranslationDto, StoryDto, PortfolioAnalysisDto } from './dto/gemini.dto';
 
 @ApiTags('gemini')
-@ApiSecurity('x-api-key')
+@ApiSecurity('x-api-key', ['x-api-key'])
+@ApiSecurity('api-key', ['api-key'])
 @Controller('gemini')
 @Throttle({ default: { limit: 5, ttl: 60000 } }) // Gemini API는 더 엄격하게: 1분에 5개 요청
 @UsePipes(new ValidationPipe({ transform: true }))
