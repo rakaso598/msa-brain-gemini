@@ -206,7 +206,7 @@ GET /health
 
 ```bash
 # curl 사용 예시
-curl -X POST "http://localhost:8000/gemini/summarize" \
+curl -X POST "http://localhost:8080/gemini/summarize" \
   -H "Content-Type: application/json" \
   -H "x-api-key: your_secure_api_key_here" \
   -d '{"text": "요약할 텍스트를 입력하세요"}'
@@ -214,7 +214,7 @@ curl -X POST "http://localhost:8000/gemini/summarize" \
 
 ### Swagger UI에서 인증
 
-1. [Swagger 문서](http://localhost:8000/api)에 접속
+1. [Swagger 문서](http://localhost:8080/api)에 접속
 2. 우측 상단의 **Authorize** 버튼 클릭
 3. API 키 입력 후 **Authorize** 클릭
 4. 이제 모든 API를 테스트할 수 있습니다
