@@ -1,7 +1,7 @@
 # ===============================================
 # 🏗️ Build Stage - 애플리케이션 빌드
 # ===============================================
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -25,7 +25,7 @@ RUN npm ci --only=production && npm cache clean --force
 # ===============================================
 # 🚀 Production Stage - 실행 환경
 # ===============================================
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # 필요한 패키지 설치 (healthcheck용)
 RUN apk add --no-cache wget dumb-init
